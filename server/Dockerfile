@@ -1,12 +1,26 @@
 # Backend NodeJS Express Dockerfile
 
-FROM node:22
+# Base
+FROM node:22 AS base
 WORKDIR /app/server
-
 COPY package*.json ./
 RUN npm install
 
-COPY . .
-EXPOSE 5000
+# Build
+FROM base AS build
+COPY tsconfig.json ./
+COPY src ./src
+RUN npx tsc
 
-CMD ["npm", "start"]
+# Runtime
+FROM node:22 AS runtime
+WORKDIR /app/server
+COPY package*.json ./
+RUN npm install --only=production
+
+## Copy compiled JS from build stage
+COPY --from=build /app/server/dist ./dist
+
+# Run Server
+EXPOSE 5000
+CMD ["node", "dist/server.js"]
