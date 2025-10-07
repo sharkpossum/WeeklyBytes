@@ -1,3 +1,3 @@
 import { CRUDRouter } from "./CRUDRouter.js";
 
-export default CRUDRouter("meals");
+export default CRUDRouter("ingredients");
